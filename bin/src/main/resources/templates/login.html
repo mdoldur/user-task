@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css"/>
+    <script src="/webjars/jquery/3.3.1-1/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js"></script>
+    <title>mdoldur.com Login</title>
+</head>
+<body>
+    <div class="container">
+        <form th:action="@{/loginAction}" th:object="${loginResultDTO}"  method="post">
+            <h1 class="h3 mb-3 font-weight-normal">Giriş Yap</h1>
+
+            <label>Kullanıcı Adınız</label>
+            <input type="text" id="username" name="userName" th:placeholder="Username" class="form-control"/>
+
+            <label>Şifreniz</label>
+            <input type="password" id="password" name="password" th:placeholder="Password" class="form-control"/>
+
+            <div class="alert alert-danger" role="alert" th:if="${invalidCredentials}">
+                <br/><br/>
+                Kullanıcı Adı veya Şifre yanlış.
+            </div>
+
+            <br/><br/><br/>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Giriş Yap</button>
+
+        </form>
+    </div>
+</body>
+</html>
