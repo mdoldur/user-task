@@ -13,7 +13,7 @@ public class TaskDTO implements Serializable {
         this.status = status;
     }
 
-    public static TaskDTO of(TaskEntity taskEntity) {
+    public static TaskDTO create(TaskEntity taskEntity) {
         return new TaskDTO(taskEntity.getName(), taskEntity.getStatus().getName());
     }
 

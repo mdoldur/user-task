@@ -8,4 +8,6 @@ public interface TaskService {
 
     List<TaskDTO> listTasks();
 
+	List<TaskDTO> listUserTasks(Long userId);
+
 }

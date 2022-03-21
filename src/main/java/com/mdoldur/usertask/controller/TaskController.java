@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -36,8 +37,10 @@ public class TaskController {
     }*/
 
     @GetMapping(value = "/task")
-    public ResponseEntity<TaskDTO> getTask() {
-        return null;
+    public ResponseEntity<TaskDTO> getUserTask(@RequestParam Long userId) {
+    	List<TaskDTO> taskDTO = taskService.listUserTasks(userId);
+    	if (taskDTO != null && taskDTO.size() > 0) return (ResponseEntity<TaskDTO>) taskDTO;
+    	return null;
     }
 
 }
