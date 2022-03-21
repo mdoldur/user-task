@@ -1,9 +1,13 @@
 package com.mdoldur.usertask.security;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -16,42 +20,60 @@ import io.jsonwebtoken.UnsupportedJwtException;
 
 @Component
 public class TokenProvider {
+
+	private static final long serialVersionUID = -2550185165626007488L;
+
+	private static String SECRET_KEY;
+
 	@Value("${app.secret.key}")
-	private String SECRET_KEY;
-	
-	@Value("${app.expires.in}")
-	private long EXPIRES_IN;
-	
-	public String generateToken(Authentication auth) {
-		JwtUserDetails user = (JwtUserDetails)auth.getPrincipal();
-		Date expireDate = new Date(new Date().getTime() + EXPIRES_IN); 
-		
+	private String secretKey;
+
+	public static final long JWT_TTL = 60 * 60 * 10;
+
+	public static String getUsername(String token) {
+		return getClaim(token, Claims::getSubject);
+	}
+
+	public static Date getExpirationDate(String token) {
+		return getClaim(token, Claims::getExpiration);
+	}
+
+	public static <T> T getClaim(String token, Function<Claims, T> claimsResolver) {
+		final Claims claims = getAllClaims(token);
+		return claimsResolver.apply(claims);
+	}
+
+	private static Claims getAllClaims(String token) {
+		return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+	}
+
+	private static Boolean isTokenExpired(String token) {
+		return getExpirationDate(token).before(new Date());
+	}
+
+	public static String generateToken(UserDetails userDetails) {
+		Map<String, Object> claims = new HashMap<>();
+		return createToken(claims, userDetails.getUsername());
+	}
+
+	private static String createToken(Map<String, Object> claims, String subject) {
 		return Jwts.builder()
-					.setSubject(String.valueOf(user.getId()))
-					.setIssuedAt(new Date())
-					.setExpiration(expireDate)
-					.signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-					.compact();
+				.setClaims(claims)
+				.setSubject(subject)
+				.setIssuedAt(new Date(System.currentTimeMillis()))
+				.setExpiration(new Date(System.currentTimeMillis() + 1000 * JWT_TTL))
+				.signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+				.compact();
 	}
-	
-	public Long getUserIdFromToken(String token) {
-		Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-		return Long.parseLong(claims.getSubject());
+
+	@Value("${app.secret.key}")
+	public void setJwtSecretStatic(String secretKey){
+		TokenProvider.SECRET_KEY = secretKey;
 	}
-	
-	public boolean validateToken(String token) {
-		try {
-			Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
-			return !this.isTokenExpired(token);
-		} catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-	
-	private boolean isTokenExpired(String token) {
-		Date expireDate = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getExpiration();
-		return expireDate.before(new Date());		
+
+	public static Boolean validateToken(String token, UserDetails userDetails) {
+		final String username = getUsername(token);
+		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}
 
 }

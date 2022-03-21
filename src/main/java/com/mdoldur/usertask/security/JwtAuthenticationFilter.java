@@ -1,59 +1,49 @@
 package com.mdoldur.usertask.security;
 
-import java.io.IOException;
+import com.mdoldur.usertask.dto.TokenizedUser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.mdoldur.usertask.service.impl.JwtUserDetailsServiceImpl;
+import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	
-	@Autowired
-	TokenProvider tokenProvider;
-	
-	@Autowired
-	JwtUserDetailsServiceImpl jwtUserDetails;
-	
-	
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		try {
-			String token = this.extractTokenFromRequest(request);
-			if (token != null && StringUtils.hasText(token)) {
-				Long userId = tokenProvider.getUserIdFromToken(token);
-				UserDetails user = jwtUserDetails.loadUserById(userId);
-				if (user != null) {
-					UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-					auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					
-					SecurityContextHolder.getContext().setAuthentication(auth);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-		filterChain.doFilter(request, response);
-	}
-	
-	private String extractTokenFromRequest(HttpServletRequest request) {
-		String bearer = request.getHeader("Authorization");
-		if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
-			return bearer.substring("Bearer".length() + 1);
-		}
-		return null;
-	}
 
+    @Autowired
+    TokenProvider tokenProvider;
+    @Autowired
+    UserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+
+        final String authorizationHeader = request.getHeader("Authorization");
+
+        String username = null;
+        String jwt = null;
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwt = authorizationHeader.substring(7);
+            username = TokenProvider.getUsername(jwt);
+        }
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            TokenizedUser userDetails = (TokenizedUser) userDetailsService.loadUserByUsername(username);
+
+            if (TokenProvider.validateToken(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+        chain.doFilter(request, response);
+    }
 }
