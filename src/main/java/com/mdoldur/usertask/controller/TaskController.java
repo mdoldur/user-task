@@ -3,6 +3,7 @@ package com.mdoldur.usertask.controller;
 import com.mdoldur.usertask.dto.TaskDTO;
 import com.mdoldur.usertask.service.interfaces.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,9 +38,11 @@ public class TaskController {
     }*/
 
     @GetMapping(value = "/task")
-    public ResponseEntity<TaskDTO> getUserTask(@RequestParam Long userId) {
+    public ResponseEntity<List<TaskDTO>> getUserTask(@RequestParam Long userId) {
     	List<TaskDTO> taskDTO = taskService.listUserTasks(userId);
-    	if (taskDTO != null && taskDTO.size() > 0) return (ResponseEntity<TaskDTO>) taskDTO;
+    	if (taskDTO != null && taskDTO.size() > 0) {
+    		return new ResponseEntity<List<TaskDTO>>(taskDTO, HttpStatus.OK);
+    	}
     	return null;
     }
 
