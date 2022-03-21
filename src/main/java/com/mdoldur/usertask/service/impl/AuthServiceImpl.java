@@ -45,6 +45,7 @@ public class AuthServiceImpl implements AuthService {
 		UserEntity user = userRepository.findByUname(loginRequest.getUserName());
 		if (user != null) {
 			String token = tokenProvider.generateToken(auth);
+			token = "Bearer " + token;
 			return this.response(user, token);
 		}
 		return null;

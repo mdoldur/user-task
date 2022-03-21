@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import com.mdoldur.usertask.security.CustomPasswordEncoder;
 import com.mdoldur.usertask.security.JwtAuthenticationEntryPoint;
 import com.mdoldur.usertask.security.JwtAuthenticationFilter;
 import com.mdoldur.usertask.service.impl.JwtUserDetailsServiceImpl;
@@ -39,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	public PasswordEncoder passwordEncoderBean() {
-		return new BCryptPasswordEncoder();
+		return new CustomPasswordEncoder();
 	}
 	
 	@Bean(BeanIds.AUTHENTICATION_MANAGER)
