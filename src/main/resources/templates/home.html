@@ -15,6 +15,7 @@
 
     <table class="table">
         <thead>
+        	<span th:text ="${#authentication.getPrincipal().getUser().getName()}"></span>
             <tr>
                 <th scope="col">Task Name</th>
                 <th scope="col">Task Status</th>

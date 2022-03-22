@@ -1,9 +1,9 @@
 package com.mdoldur.usertask.security;
 
-import com.mdoldur.usertask.dto.TokenizedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,27 +23,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-
         final String authorizationHeader = request.getHeader("Authorization");
-
         String username = null;
-        String jwt = null;
-
+        String token = null;
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            username = TokenProvider.getUsername(jwt);
+        	token = authorizationHeader.substring(7);
+            username = TokenProvider.getUsername(token);
         }
-
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            TokenizedUser userDetails = (TokenizedUser) userDetailsService.loadUserByUsername(username);
-
-            if (TokenProvider.validateToken(jwt, userDetails)) {
+            if (!TokenProvider.isTokenExpired(token)) {
+            	UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+        
         chain.doFilter(request, response);
     }
 }

@@ -10,24 +10,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class JwtUserDetails implements UserDetails {
+public class TokenizedUser implements UserDetails {
 	private static final long serialVersionUID = 1L;
 	private Long id;
     private String username;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
     
-	private JwtUserDetails(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+	private TokenizedUser(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.authorities = authorities;
 	}
 	
-    public static JwtUserDetails create(UserEntity user) {
+    public static TokenizedUser create(UserEntity user) {
     	List<GrantedAuthority> authoritiesList = new ArrayList<>();
         authoritiesList.add(new SimpleGrantedAuthority("user"));
-    	return new JwtUserDetails(user.getUserId(), user.getUname(), user.getPassword(), authoritiesList);
+    	return new TokenizedUser(user.getUserId(), user.getUname(), user.getPassword(), authoritiesList);
     }
     
 	public Long getId() {
