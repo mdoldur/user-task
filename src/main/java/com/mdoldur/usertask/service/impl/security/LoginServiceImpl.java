@@ -3,7 +3,7 @@ package com.mdoldur.usertask.service.impl.security;
 import com.mdoldur.usertask.dto.LoginResultDTO;
 import com.mdoldur.usertask.entity.UserEntity;
 import com.mdoldur.usertask.repository.UserRepository;
-import com.mdoldur.usertask.service.interfaces.LoginService;
+import com.mdoldur.usertask.service.interfaces.security.LoginService;
 
 import java.io.Console;
 

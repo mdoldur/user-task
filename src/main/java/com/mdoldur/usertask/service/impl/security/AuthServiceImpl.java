@@ -1,11 +1,13 @@
-package com.mdoldur.usertask.service.impl;
+package com.mdoldur.usertask.service.impl.security;
 
 import com.mdoldur.usertask.requests.UserRequest;
 import com.mdoldur.usertask.responses.AuthResponse;
 import com.mdoldur.usertask.security.TokenProvider;
 import com.mdoldur.usertask.security.TokenizedUser;
-import com.mdoldur.usertask.service.interfaces.AuthService;
+import com.mdoldur.usertask.service.interfaces.security.AuthService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,13 +17,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthServiceImpl implements AuthService {
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    //@Autowired
+    //private AuthenticationManager authenticationManager;
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private ApplicationContext appContext;
     
     public AuthResponse login(UserRequest loginRequest) {
         try {
+        	AuthenticationManager authenticationManager = appContext.getBean(AuthenticationManager.class);
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword()));
             
             final TokenizedUser tokenizedUser = (TokenizedUser) userDetailsService.loadUserByUsername(loginRequest.getUserName());

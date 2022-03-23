@@ -1,4 +1,4 @@
-package com.mdoldur.usertask.service.interfaces;
+package com.mdoldur.usertask.service.interfaces.security;
 
 import com.mdoldur.usertask.dto.LoginResultDTO;
 

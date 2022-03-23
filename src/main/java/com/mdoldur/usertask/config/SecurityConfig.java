@@ -20,7 +20,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import com.mdoldur.usertask.security.JwtAuthenticationEntryPoint;
 import com.mdoldur.usertask.security.JwtAuthenticationFilter;
-import com.mdoldur.usertask.service.impl.JwtUserDetailsServiceImpl;
+import com.mdoldur.usertask.service.impl.security.JwtUserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity

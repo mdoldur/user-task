@@ -1,8 +1,8 @@
 package com.mdoldur.usertask.controller;
 
 import com.mdoldur.usertask.dto.LoginResultDTO;
-import com.mdoldur.usertask.service.interfaces.LoginService;
-import com.mdoldur.usertask.service.interfaces.TaskService;
+import com.mdoldur.usertask.service.interfaces.security.LoginService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,5 +35,5 @@ public class HomeController {
         model.addAttribute("invalidCredentials", true);
         return "login";
     }
-
+    
 }

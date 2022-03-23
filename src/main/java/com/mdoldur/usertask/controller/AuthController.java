@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mdoldur.usertask.requests.UserRequest;
 import com.mdoldur.usertask.responses.AuthResponse;
-import com.mdoldur.usertask.service.interfaces.AuthService;
 import com.mdoldur.usertask.service.interfaces.UserService;
+import com.mdoldur.usertask.service.interfaces.security.AuthService;
 
 @RestController
 @RequestMapping("/auth")

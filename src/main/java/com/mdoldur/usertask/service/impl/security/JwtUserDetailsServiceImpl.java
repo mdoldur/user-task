@@ -1,4 +1,4 @@
-package com.mdoldur.usertask.service.impl;
+package com.mdoldur.usertask.service.impl.security;
 
 import com.mdoldur.usertask.entity.UserEntity;
 import com.mdoldur.usertask.repository.UserRepository;
